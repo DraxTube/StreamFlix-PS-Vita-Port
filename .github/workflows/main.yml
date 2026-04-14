@@ -1,0 +1,58 @@
+name: Build VPK
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build StreamFlix Vita VPK
+    runs-on: ubuntu-latest
+    container:
+      image: vitasdk/vitasdk:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          apk add --no-cache cmake make git bash
+
+      - name: Install vita libraries
+        run: |
+          vdpm curl
+          vdpm jansson
+          vdpm openssl
+          vdpm libvita2d
+          vdpm freetype
+          vdpm libpng
+          vdpm libjpeg-turbo
+
+      - name: Configure
+        working-directory: vita
+        run: |
+          mkdir -p build && cd build
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake
+
+      - name: Build
+        working-directory: vita/build
+        run: make -j$(nproc)
+
+      - name: Upload VPK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: streamflix-vita-vpk
+          path: vita/build/*.vpk
+          retention-days: 30
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: vita/build/*.vpk
+          generate_release_notes: true
