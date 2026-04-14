@@ -59,6 +59,8 @@ target_link_libraries(${PROJECT_NAME}
   ssl
   crypto
   jansson
+  z
+  zstd
   freetype
   png
   jpeg

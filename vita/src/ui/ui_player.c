@@ -1,5 +1,6 @@
 /* Video Player using SceAvPlayer */
 #include "ui_common.h"
+#include <malloc.h>
 #include <psp2/avplayer.h>
 #include <psp2/audiodec.h>
 #include <psp2/kernel/threadmgr.h>
