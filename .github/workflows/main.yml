@@ -64,7 +64,17 @@ jobs:
           elif [ -d "build" ]; then
             cd build
           fi
-          make -j$(nproc)
+          make -j$(nproc) 2>&1 || {
+            echo "=== Build failed, checking relocations ==="
+            arm-vita-eabi-readelf -r streamflix-vita 2>/dev/null | grep -E "R_ARM.*(25|43|44)" | head -20 || true
+            echo "=== Checking which .o files have type 25 ==="
+            for f in CMakeFiles/streamflix-vita.dir/src/**/*.obj; do
+              if arm-vita-eabi-readelf -r "$f" 2>/dev/null | grep -q "00019"; then
+                echo "PROBLEMATIC: $f"
+              fi
+            done
+            exit 1
+          }
 
       - name: Upload VPK artifact
         uses: actions/upload-artifact@v4
