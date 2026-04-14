@@ -29,11 +29,34 @@ jobs:
           vdpm jansson
           vdpm openssl
           vdpm zlib
-          vdpm libzstd
           vdpm libvita2d
           vdpm freetype
           vdpm libpng
           vdpm libjpeg-turbo
+
+      - name: Install zstd
+        run: |
+          vdpm zstd || {
+            echo "vdpm zstd failed, building from source..."
+            cd /tmp
+            wget -q https://github.com/AuroraWright/vita-zstd/releases/download/v1.5.5/zstd.tar.xz || {
+              wget -q https://github.com/facebook/zstd/releases/download/v1.5.5/zstd-1.5.5.tar.gz
+              tar xzf zstd-1.5.5.tar.gz
+              cd zstd-1.5.5/lib
+              $VITASDK/bin/arm-vita-eabi-gcc -c -O2 -DZSTD_DISABLE_ASM zstd_decompress.c zstd_ddict.c zstd_common.c zstd_xxx.c 2>/dev/null || {
+                $VITASDK/bin/arm-vita-eabi-gcc -c -O2 -DZSTD_DISABLE_ASM -DZSTD_LEGACY_SUPPORT=0 \
+                  decompress/zstd_decompress.c decompress/zstd_decompress_block.c decompress/huf_decompress.c \
+                  common/zstd_common.c common/entropy_common.c common/fse_decompress.c common/xxhash.c common/error_private.c \
+                  compress/zstd_compress.c compress/zstd_compress_literals.c compress/zstd_compress_sequences.c \
+                  compress/zstd_compress_superblock.c compress/fse_compress.c compress/hist.c compress/huf_compress.c \
+                  compress/zstd_double_fast.c compress/zstd_fast.c compress/zstd_lazy.c compress/zstd_ldm.c compress/zstd_opt.c \
+                  2>/dev/null || true
+              }
+              $VITASDK/bin/arm-vita-eabi-ar rcs libzstd.a *.o 2>/dev/null || true
+              cp -f libzstd.a $VITASDK/arm-vita-eabi/lib/ 2>/dev/null || true
+              cp -f ../lib/zstd.h $VITASDK/arm-vita-eabi/include/ 2>/dev/null || true
+            }
+          }
 
       - name: Debug - List files
         run: |
