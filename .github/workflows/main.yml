@@ -28,31 +28,55 @@ jobs:
           vdpm curl
           vdpm jansson
           vdpm openssl
+          vdpm zlib
+          vdpm libzstd
           vdpm libvita2d
           vdpm freetype
           vdpm libpng
           vdpm libjpeg-turbo
 
-      - name: Configure
-        working-directory: vita
+      - name: Debug - List files
         run: |
+          echo "=== Root ==="
+          ls -la
+          echo "=== Looking for CMakeLists.txt ==="
+          find . -name "CMakeLists.txt" -maxdepth 3
+
+      - name: Configure
+        run: |
+          # Find where CMakeLists.txt is
+          if [ -f "vita/CMakeLists.txt" ]; then
+            cd vita
+          elif [ -f "CMakeLists.txt" ]; then
+            echo "CMakeLists.txt in root"
+          else
+            echo "ERROR: CMakeLists.txt not found!"
+            exit 1
+          fi
           mkdir -p build && cd build
           cmake .. -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake
 
       - name: Build
-        working-directory: vita/build
-        run: make -j$(nproc)
+        run: |
+          if [ -d "vita/build" ]; then
+            cd vita/build
+          elif [ -d "build" ]; then
+            cd build
+          fi
+          make -j$(nproc)
 
       - name: Upload VPK artifact
         uses: actions/upload-artifact@v4
         with:
           name: streamflix-vita-vpk
-          path: vita/build/*.vpk
+          path: |
+            **/build/*.vpk
           retention-days: 30
 
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: vita/build/*.vpk
+          files: |
+            **/build/*.vpk
           generate_release_notes: true
