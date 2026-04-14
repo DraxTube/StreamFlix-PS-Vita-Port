@@ -31,6 +31,7 @@ set(SRC_FILES
   src/ui/ui_player.c
   src/ui/font_pgf.c
   src/db/database.c
+  src/net/zstd_stub.c
 )
 
 add_executable(${PROJECT_NAME} ${SRC_FILES})
@@ -60,7 +61,6 @@ target_link_libraries(${PROJECT_NAME}
   crypto
   jansson
   z
-  zstd
   freetype
   png
   jpeg
