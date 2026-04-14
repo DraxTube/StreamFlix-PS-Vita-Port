@@ -48,8 +48,6 @@ target_link_libraries(${PROJECT_NAME}
   SceSysmodule_stub
   SceNet_stub
   SceNetCtl_stub
-  SceHttp_stub
-  SceSsl_stub
   SceAvPlayer_stub
   SceAudio_stub
   SceAudiodec_stub

@@ -10,8 +10,6 @@
 #include <psp2/sysmodule.h>
 #include <psp2/net/net.h>
 #include <psp2/net/netctl.h>
-#include <psp2/net/http.h>
-#include <psp2/ssl.h>
 #include <psp2/apputil.h>
 #include <psp2/io/fcntl.h>
 #include <psp2/io/stat.h>

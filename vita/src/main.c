@@ -13,18 +13,14 @@ static char net_memory[1 * 1024 * 1024];
 
 static void init_network(void) {
     sceSysmoduleLoadModule(SCE_SYSMODULE_NET);
-    sceSysmoduleLoadModule(SCE_SYSMODULE_HTTP);
-    sceSysmoduleLoadModule(SCE_SYSMODULE_HTTPS);
-    sceSysmoduleLoadModule(SCE_SYSMODULE_SSL);
     SceNetInitParam p; p.memory = net_memory; p.size = sizeof(net_memory); p.flags = 0;
     sceNetInit(&p); sceNetCtlInit();
-    sceSslInit(300*1024); sceHttpInit(400*1024);
     g_app.net_initialized = true;
 }
 
 static void cleanup_network(void) {
     if (!g_app.net_initialized) return;
-    sceHttpTerm(); sceSslTerm(); sceNetCtlTerm(); sceNetTerm();
+    sceNetCtlTerm(); sceNetTerm();
 }
 
 void app_init(void) {
