@@ -11,7 +11,8 @@ endif()
 project(streamflix-vita C)
 include("${VITASDK}/share/vita.cmake" REQUIRED)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O2 -fno-lto")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O2 -fno-lto -mthumb")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--allow-multiple-definition")
 
 set(VITA_APP_NAME "StreamFlix")
 set(VITA_TITLEID  "STFX00001")
@@ -66,8 +67,9 @@ target_link_libraries(${PROJECT_NAME}
   jpeg
   z
   m
-  c
-  pthread
+  SceLibKernel_stub
+  SceKernelThreadMgr_stub
+  SceIofilemgr_stub
 )
 
 vita_create_self(${PROJECT_NAME}.self ${PROJECT_NAME} UNSAFE)
