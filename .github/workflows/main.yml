@@ -21,7 +21,7 @@ jobs:
 
       - name: Install build tools
         run: |
-          apk add --no-cache cmake make git bash
+          apk add --no-cache cmake make git bash gcc musl-dev
 
       - name: Install vita libraries
         run: |
